@@ -1,6 +1,6 @@
 # File-Drop
 
-Minimal file hosting app. Upload files from the browser, store them in S3, and share download links — no login required.
+Scalable file hosting app deployed on AWS — static frontend on S3, API behind an Application Load Balancer, Node.js servers managed by an Auto Scaling Group, and file storage on S3.
 
 Built with Node.js + Express on the backend and a plain HTML/CSS/JS frontend.
 
