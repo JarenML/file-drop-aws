@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { S3Client, ListObjectsV2Command, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, ListObjectsV2Command, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const { Upload } = require('@aws-sdk/lib-storage');
 const multer = require('multer');
 
@@ -62,6 +62,21 @@ router.get('/download/:key', async (req, res) => {
     res.setHeader('Content-Disposition', `attachment; filename="${req.params.key}"`);
     data.Body.pipe(res);
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Eliminar archivo
+router.delete('/:key', async (req, res) => {
+  try {
+    await s3.send(new DeleteObjectCommand({
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: req.params.key,
+    }));
+    res.json({ message: 'Archivo eliminado' });
+  } catch (err) {
+    console.log("ERROR")
+    console.log(err.message)
     res.status(500).json({ error: err.message });
   }
 });

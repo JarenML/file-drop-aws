@@ -393,6 +393,27 @@
             color: #000;
         }
 
+        .btn-delete {
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--danger);
+            background: none;
+            border: 1px solid var(--danger);
+            padding: 6px 14px;
+            cursor: pointer;
+            transition:
+                background 0.15s,
+                color 0.15s;
+        }
+
+        .btn-delete:hover {
+            background: var(--danger);
+            color: #000;
+        }
+
         /* Empty state */
         .empty {
             padding: 48px 0;
@@ -558,7 +579,12 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        const API = "http://file-drop-alb-240168612.us-east-1.elb.amazonaws.com";
+        const ENVIRONMENT = "ENV";
+        const API =
+            window.location.hostname === "localhost"
+                ? "http://localhost:3000"
+                : "http://file-drop-alb-240168612.us-east-1.elb.amazonaws.com";
+
         const MAX_FILES = 10;
         let currentCount = 0;
 
@@ -701,6 +727,7 @@
             </div>
             <div class="file-actions">
               <a class="btn-download" href="${API}/api/files/download/${f.name}">Descargar</a>
+              <button class="btn-delete" onclick="deleteFile('${f.name}')">Eliminar</button>
             </div>
           </div>`,
                     )
@@ -735,6 +762,23 @@
                 showToast("Error al subir el archivo", "error");
                 uploadBtn.disabled = false;
                 uploadBtn.innerHTML = "Subir archivo";
+            }
+        }
+
+        async function deleteFile(key) {
+            if (!confirm(`¿Eliminar "${key}"?`)) return;
+            try {
+                const res = await fetch(
+                    `${API}/api/files/${encodeURIComponent(key)}`,
+                    { method: "DELETE" },
+                );
+                if (!res.ok) throw new Error();
+                showToast("Archivo eliminado", "success");
+                loadFiles();
+            } catch (error) {
+                console.log("ERRRORRRRRRRRR");
+                console.log(error);
+                showToast("Error al eliminar el archivo", "error");
             }
         }
 
